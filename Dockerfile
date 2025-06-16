@@ -1,20 +1,22 @@
-# Используем официальный Python образ
 FROM python:3.12-slim
 
-# Устанавливаем рабочую директорию
+# Устанавливаем системные зависимости, включая Rust
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    libffi-dev \
+    rustc \
+    cargo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Установка зависимостей проекта
 WORKDIR /app
-
-# Копируем зависимости и устанавливаем
 COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Копируем весь код бота
+# Копируем исходный код
 COPY . .
 
-# Устанавливаем переменную окружения для запуска
-ENV BOT_TOKEN=your_token_here
-ENV CHAT_ID=your_chat_id_here
-
-# Запускаем бота
+# Запуск
 CMD ["python", "bot.py"]
