@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     libffi-dev \
+    python3-dev \
     rustc \
     cargo \
     && rm -rf /var/lib/apt/lists/*
@@ -18,5 +19,5 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Копируем исходный код
 COPY . .
 
-# Указываем команду по умолчанию (замени на свою, если нужно)
+# Указываем команду по умолчанию (если твой скрипт называется bot.py)
 CMD ["python", "bot.py"]
