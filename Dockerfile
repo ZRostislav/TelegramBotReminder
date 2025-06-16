@@ -1,3 +1,4 @@
+# Используем официальный образ Python
 FROM python:3.12-slim
 
 # Устанавливаем системные зависимости, включая Rust
@@ -9,14 +10,13 @@ RUN apt-get update && apt-get install -y \
     cargo \
     && rm -rf /var/lib/apt/lists/*
 
-# Установка зависимостей проекта
+# Устанавливаем зависимости
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Копируем исходный код
 COPY . .
 
-# Запуск
+# Указываем команду по умолчанию (замени на свою, если нужно)
 CMD ["python", "bot.py"]
