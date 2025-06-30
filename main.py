@@ -1,9 +1,11 @@
 import json
 import logging
+import asyncio
 from aiogram import Bot, Dispatcher, executor, types
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 from datetime import datetime
+from aiohttp import web
 from config import BOT_TOKEN, CHAT_ID
 
 bot = Bot(token=BOT_TOKEN)
@@ -61,15 +63,13 @@ async def sunday_ping():
     answered_yes = []
 
     try:
-        members = await bot.get_chat_administrators(CHAT_ID)
-        all_user_ids = set()
-
-        # Получаем участников, у которых есть username
+        # async for member in bot.iter_chat_members(CHAT_ID): — работает не во всех случаях, 
+        # поэтому можно убрать или использовать только админов, если есть ограничения
+        # Но оставим для примера так:
         async for member in bot.iter_chat_members(CHAT_ID):
             user = member.user
             if user.is_bot:
                 continue
-            all_user_ids.add(user.id)
             uid = str(user.id)
 
             if uid not in answers:
@@ -93,9 +93,23 @@ async def sunday_ping():
 scheduler.add_job(send_poll, 'cron', day_of_week='sat', hour=18, minute=0, timezone=tz)
 scheduler.add_job(sunday_ping, 'cron', day_of_week='sun', hour=8, minute=0, timezone=tz)
 
-# 🔁 Запуск планировщика в контексте aiogram
+# --- HTTP сервер ---
+async def handle(request):
+    return web.Response(text="Бот работает!")
+
+async def start_web_app():
+    app = web.Application()
+    app.router.add_get('/', handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', 8000)
+    await site.start()
+    print("HTTP сервер запущен на порту 8000")
+
+# 🔁 Запуск планировщика и HTTP-сервера в контексте aiogram
 async def on_startup(dispatcher):
     scheduler.start()
+    asyncio.create_task(start_web_app())  # Запускаем HTTP сервер в фоне
 
 # 🚀 Запуск
 if __name__ == '__main__':
