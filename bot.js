@@ -1,8 +1,12 @@
+require('dotenv').config(); // Загружаем переменные из .env
+
 const { Telegraf } = require('telegraf');
 const cron = require('node-cron');
 const fs = require('fs');
 const express = require('express');
-const { BOT_TOKEN, CHAT_ID } = require('./config');
+
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const CHAT_ID = process.env.CHAT_ID;
 
 const bot = new Telegraf(BOT_TOKEN);
 const DATA_FILE = 'database.json';
@@ -149,7 +153,6 @@ bot.command('sendpoll', async (ctx) => {
 // ========== Планировщик ==========
 //
 
-// 🕒 Планировщики (Europe/Chisinau)
 cron.schedule('0 18 * * 6', sendPoll, { timezone: 'Europe/Chisinau' }); // Суббота 18:00
 cron.schedule('0 8 * * 0', sundayPing, { timezone: 'Europe/Chisinau' }); // Воскресенье 08:00
 
