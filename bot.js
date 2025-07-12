@@ -166,7 +166,7 @@ app.use(bot.webhookCallback(WEBHOOK_PATH));
 app.get('/', (req, res) => res.send('Бот работает через Webhook ✅'));
 
 app.listen(PORT, async () => {
-  const webhookUrl = `https://${process.env.RENDER_EXTERNAL_URL || 'telegrambotreminder-pn1p.onrender.com'}${WEBHOOK_PATH}`;
+const webhookUrl = `${process.env.RENDER_EXTERNAL_URL || 'https://telegrambotreminder-j85u.onrender.com'}${WEBHOOK_PATH}`;
   await bot.telegram.setWebhook(webhookUrl);
   console.log(`🤖 Бот запущен через Webhook на ${webhookUrl}`);
 });
